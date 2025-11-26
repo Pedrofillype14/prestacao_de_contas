@@ -1,54 +1,162 @@
-<section style="
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-">
-
-  <!-- Logo da Energisa -->
-  <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Logo_energisa.png"
-         alt="Energisa"
-         style="max-width: 180px; width: 50%; height: auto;">
-  </div>
-
-  <!-- Título principal -->
-  <h2 style="
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulário de Solicitação</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #ffffff);
+      padding: 30px;
+      color: #333;
+    }
+    h2 {
       text-align: center;
-      font-size: 26px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: #00579d;
-      text-transform: uppercase;
-  ">
-    Prestação de Contas - ADD
-  </h2>
-
-  <p style="
-      text-align: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #0d47a1;
+    }
+    form {
+      max-width: 650px;
+      margin: auto;
+      background: #ffffffcc;
+      padding: 25px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      width: 95%;
+    }
+    label {
+      font-weight: 600;
+      margin-top: 15px;
+      display: block;
+      font-size: 15px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 14px;
+      margin-top: 6px;
+      border-radius: 12px;
+      border: 1px solid #b0bec5;
+      background: #f7f9fc;
+      transition: 0.2s;
       font-size: 16px;
-      color: #444;
-      margin-bottom: 25px;
-  ">
-    Preencha o formulário abaixo para registrar sua solicitação.
-  </p>
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #1e88e5;
+      box-shadow: 0 0 5px rgba(30,136,229,0.4);
+      background: white;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #1e88e5;
+      color: white;
+      border: none;
+      margin-top: 28px;
+      border-radius: 12px;
+      font-size: 17px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #0d47a1;
+    }
+    hr {
+      margin: 25px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div style="text-align:center; margin-bottom:20px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Logo_energisa.png" alt="Energisa" style="max-width:160px; height:auto; margin-bottom:10px;" />
+    <h1 style="font-size:26px; color:#0d47a1; margin:0;">PRESTAÇÃO DE CONTAS - ADD</h1>
+  </div>
+  <h2>Formulário de Solicitação</h2>
+  <form>
+    <label>Nome *</label>
+    <input type="text" required />
 
-  <!-- Forms Embed -->
-  <iframe
-    width="100%"
-    height="900px"
-    src="https://forms.office.com/Pages/ResponsePage.aspx?id=hoDG-Fy5y0mdOO03lAq-9UngTuVFqy5ApQPSB5f0QDJUQlVOWVRIWEZDQVBYUDBRUk9WNjlZNjlWSS4u&embed=true"
-    frameborder="0"
-    marginwidth="0"
-    marginheight="0"
-    style="border: none; border-radius: 12px; width: 100%;"
-    allowfullscreen
-    webkitallowfullscreen
-    mozallowfullscreen
-    msallowfullscreen>
-  </iframe>
+    <label>Regional *</label>
+    <select required>
+      <option value="">Selecione...</option>
+      <option>LESTE</option>
+      <option>CENTRO</option>
+      <option>OESTE</option>
+    </select>
 
-</section>
+    <label>Polo *</label>
+    <select required>
+      <option value="">Selecione...</option>
+      <option>João Pessoa</option>
+      <option>Itabaiana</option>
+      <option>Mamanguape</option>
+      <option>Borborema</option>
+      <option>Campina Grande</option>
+      <option>Monteiro</option>
+      <option>Guarabira</option>
+      <option>Esperança</option>
+      <option>Itaporanga</option>
+      <option>Sousa</option>
+      <option>Patos</option>
+      <option>Catolé do Rocha</option>
+    </select>
+
+    <label>Matrícula *</label>
+    <input type="text" required />
+
+    <label>Data do uso *</label>
+    <input type="date" required />
+
+    <label>Tipo de Refeição *</label>
+    <select required>
+      <option value="">Selecione...</option>
+      <option>ALMOÇO</option>
+      <option>JANTA</option>
+      <option>EXTRA (APÓS DUAS HORAS DO FINAL DA ESCALA) EXCEÇÃO</option>
+    </select>
+
+    <label>Horário *</label>
+    <input type="time" required />
+
+    <label>Localidade em que foi usado o ADD *</label>
+    <input type="text" required />
+
+    <label>Solicitar localização geográfica *</label>
+    <button type="button" onclick="getLocation()">Obter Localização</button>
+    <input id="geo" type="text" placeholder="Aguardando localização..." required />
+
+    <script>
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((pos) => {
+            document.getElementById('geo').value = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+          });
+        } else {
+          alert("Geolocalização não suportada pelo navegador.");
+        }
+      }
+    </script>
+
+    <hr>
+
+    <label>Sequência do ADD (opcional)</label>
+    <input type="text" placeholder="Ex: 1°, 2°, 3°" />
+
+    <label>Número da OS / RR / SS (opcional)</label>
+    <input type="text" />
+
+    <label>Número do ADD (opcional)</label>
+    <input type="text" />
+
+    <label>Observação sobre a refeição (opcional)</label>
+    <textarea rows="3"></textarea>
+
+    <button type="submit">Enviar</button>
+  </form>
+</body>
+</html>
