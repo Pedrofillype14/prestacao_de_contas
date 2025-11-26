@@ -5,34 +5,55 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Prestação de Contas - ADD</title>
 <style>
-  body{font-family: "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg,#e3f2fd,#fff); padding:24px; color:#333;}
+  /* --- CORREÇÃO PRINCIPAL AQUI --- */
+  * { box-sizing: border-box; } 
+
+  body{font-family: "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg,#e3f2fd,#fff); padding:24px; color:#333; margin: 0;}
   .card{max-width:900px;margin:18px auto;padding:20px;border-radius:12px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
   h1{text-align:center;color:#0d47a1;margin:6px 0 12px;font-size:20px;text-transform:uppercase;}
   form{display:grid;gap:10px;}
-  label{font-weight:600;font-size:14px;}
-  input,select,textarea,button{width:100%;padding:12px;border-radius:8px;border:1px solid #cfd8dc;background:#f7f9fc;font-size:15px}
-  button{background:#1e88e5;color:#fff;border:none;cursor:pointer;font-weight:700}
+  label{font-weight:600;font-size:14px; margin-bottom: 4px; display:block;}
+  
+  /* Ajuste no input para não estourar */
+  input,select,textarea,button{
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #cfd8dc;
+    background:#f7f9fc;
+    font-size:15px;
+    outline: none; /* remove borda azul padrão do chrome ao clicar */
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    border-color: #1e88e5;
+    background: #fff;
+  }
+
+  button{background:#1e88e5;color:#fff;border:none;cursor:pointer;font-weight:700; transition: background 0.3s;}
+  button:hover{background:#1565c0;}
+  
   .small{padding:8px;font-size:13px}
   .muted{color:#666;font-size:13px;text-align:center}
 
-  /* === versão final e única da classe .row === */
+  /* === GRID DA LINHA === */
   .row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    margin-bottom: -4px;
+    grid-template-columns: 1fr 1fr; /* Divide exatamente em 2 metades iguais */
+    gap: 15px; /* Espaço seguro entre os inputs */
+    margin-bottom: 2px;
   }
 
+  /* Ajuste para celular */
   @media (max-width: 720px) {
     .row {
-      grid-template-columns: 1fr;
-      gap: 4px;
-      margin-bottom: 0;
+      grid-template-columns: 1fr; /* Vira 1 coluna no celular */
+      gap: 10px;
     }
+    body { padding: 12px; } /* Menos margem na borda do celular */
   }
 
-  /* melhora visual do botão de geo para não ocupar 100% do input quando quiser */
-  button.small { width: 100%; box-sizing: border-box; }
+  button.small { width: 100%; }
 </style>
 </head>
 <body>
@@ -43,21 +64,28 @@
     </div>
 
     <form id="addForm" autocomplete="off">
-      <label>Nome *</label>
-      <input id="nome" type="text" required>
+      <div>
+        <label>Nome *</label>
+        <input id="nome" type="text" required>
+      </div>
 
-      <label>Regional *</label>
-      <select id="regional" required>
-        <option value="">Selecione...</option><option>LESTE</option><option>CENTRO</option><option>OESTE</option>
-      </select>
-
-      <label>Polo *</label>
-      <select id="polo" required>
-        <option value="">Selecione...</option>
-        <option>João Pessoa</option><option>Itabaiana</option><option>Mamanguape</option><option>Borborema</option>
-        <option>Campina Grande</option><option>Monteiro</option><option>Guarabira</option><option>Esperança</option>
-        <option>Itaporanga</option><option>Sousa</option><option>Patos</option><option>Catolé do Rocha</option>
-      </select>
+      <div class="row">
+        <div>
+           <label>Regional *</label>
+           <select id="regional" required>
+             <option value="">Selecione...</option><option>LESTE</option><option>CENTRO</option><option>OESTE</option>
+           </select>
+        </div>
+        <div>
+           <label>Polo *</label>
+           <select id="polo" required>
+             <option value="">Selecione...</option>
+             <option>João Pessoa</option><option>Itabaiana</option><option>Mamanguape</option><option>Borborema</option>
+             <option>Campina Grande</option><option>Monteiro</option><option>Guarabira</option><option>Esperança</option>
+             <option>Itaporanga</option><option>Sousa</option><option>Patos</option><option>Catolé do Rocha</option>
+           </select>
+        </div>
+      </div>
 
       <div class="row">
         <div>
@@ -75,7 +103,7 @@
           <label>Tipo de Refeição *</label>
           <select id="tiporefeicao" required>
             <option value="">Selecione...</option>
-            <option>ALMOÇO</option><option>JANTA</option><option>EXTRA (APÓS DUAS HORAS DO FINAL DA ESCALA) EXCEÇÃO</option>
+            <option>ALMOÇO</option><option>JANTA</option><option>EXTRA (APÓS DUAS HORAS DO FINAL DA ESCALA)</option>
           </select>
         </div>
         <div>
@@ -84,8 +112,10 @@
         </div>
       </div>
 
-      <label>Localidade em que foi usado o ADD *</label>
-      <input id="localidade" type="text" required>
+      <div>
+        <label>Localidade em que foi usado o ADD *</label>
+        <input id="localidade" type="text" required>
+      </div>
 
       <div class="row">
         <div>
@@ -98,8 +128,10 @@
         </div>
       </div>
 
-      <label>Sequência do ADD (opcional)</label>
-      <input id="sequencia" type="text" placeholder="Ex: 1°, 2°, 3°">
+      <div>
+        <label>Sequência do ADD (opcional)</label>
+        <input id="sequencia" type="text" placeholder="Ex: 1°, 2°, 3°">
+      </div>
 
       <div class="row">
         <div>
@@ -112,10 +144,12 @@
         </div>
       </div>
 
-      <label>Observação sobre a refeição (opcional)</label>
-      <textarea id="observacao" rows="3"></textarea>
+      <div>
+        <label>Observação sobre a refeição (opcional)</label>
+        <textarea id="observacao" rows="3"></textarea>
+      </div>
 
-      <button id="btnSubmit" type="submit">Enviar (E-mail + CSV)</button>
+      <button id="btnSubmit" type="submit" style="margin-top:10px">Enviar (E-mail + CSV)</button>
       <p class="muted">O e-mail será enviado para: <b>pedro.fillype@energisa.com.br</b></p>
     </form>
   </div>
@@ -137,7 +171,6 @@ function slugifyName(s) {
 
 /* wait DOM */
 document.addEventListener("DOMContentLoaded", () => {
-  // pegar elementos de forma explícita (corrige o problema principal)
   const form = document.getElementById("addForm");
   const btnGeo = document.getElementById("btnGeo");
   const btnSubmit = document.getElementById("btnSubmit");
@@ -156,9 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const numeroadd = document.getElementById("numeroadd");
   const observacao = document.getElementById("observacao");
 
-  /* --------------------------
-    GEOLOCATION
-  ---------------------------*/
+  /* GEOLOCATION */
   btnGeo.addEventListener("click", () => {
     if (!navigator.geolocation) { alert("Geolocalização não suportada."); return; }
     btnGeo.innerText = "Capturando...";
@@ -166,17 +197,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const lat = pos.coords.latitude.toFixed(6);
       const lng = pos.coords.longitude.toFixed(6);
       geo.value = `${lat}, ${lng}`;
-      btnGeo.innerText = "Obter Localização";
+      btnGeo.innerText = "Localização OK!";
+      btnGeo.style.background = "#43a047";
     }, (err)=>{
       console.error(err);
-      alert("Erro ao capturar localização: " + (err.message || "permission denied"));
+      alert("Ative o GPS e tente novamente.");
       btnGeo.innerText = "Obter Localização";
     }, {enableHighAccuracy:true, timeout:10000});
   });
 
-  /* --------------------------
-    CSV helpers
-  ---------------------------*/
+  /* CSV helpers com fix UTF-8 BOM */
   function gerarCSVString(obj) {
     const headers = ["timestamp","nome","regional","polo","matricula","datauso","tiporefeicao","horario","localidade","localizacao_gps","sequencia","osrrss","numeroadd","observacao"];
     const linha = [
@@ -189,7 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function baixarCSV(csvString, filename) {
-    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    // Adicionado \uFEFF para o Excel abrir acentos corretamente
+    const blob = new Blob(["\uFEFF" + csvString], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -200,9 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return url;
   }
 
-  /* --------------------------
-    EmailJS loader + sender
-  ---------------------------*/
+  /* EmailJS loader */
   let emailjsReady = false;
   async function ensureEmailJS() {
     if (emailjsReady && window.emailjs) return;
@@ -226,50 +255,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!window.emailjs) throw new Error("EmailJS não carregado");
 
     const plain = `
-Nova prestação de contas registrada:
-
+NOVA PRESTAÇÃO - ADD
+--------------------
 Nome: ${payload.nome}
-Regional: ${payload.regional}
-Polo: ${payload.polo}
 Matrícula: ${payload.matricula}
-Data do uso: ${payload.datauso}
-Tipo de refeição: ${payload.tiporefeicao}
-Horário: ${payload.horario}
-Localidade: ${payload.localidade}
-Localização GPS: ${payload.localizacao_gps}
-Sequência: ${payload.sequencia}
+Data: ${payload.datauso}
+Regional: ${payload.regional} | Polo: ${payload.polo}
+Refeição: ${payload.tiporefeicao} (${payload.horario})
+Local: ${payload.localidade}
+GPS: ${payload.localizacao_gps}
 OS/RR/SS: ${payload.osrrss}
-Número do ADD: ${payload.numeroadd}
-Observação: ${payload.observacao}
-Timestamp: ${payload.timestamp}
-    `;
-
-    const html = `
-      <div style="font-family:Arial,Helvetica,sans-serif">
-        <h3>Nova prestação de contas - ADD</h3>
-        <pre>${plain}</pre>
-        <p>CSV gerado (anexo no corpo):</p>
-        <pre>${csvString}</pre>
-      </div>
+Nº ADD: ${payload.numeroadd}
+Obs: ${payload.observacao}
     `;
 
     return emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
       to_email: CONFIG.EMAIL_TO,
-      subject: `Prestação ADD - ${payload.nome} - ${payload.datauso}`,
+      subject: `ADD - ${payload.nome} - ${payload.datauso}`,
       plain_body: plain,
-      html_body: html,
       csv_content: csvString,
       filename: csvFilename
     });
   }
 
-  /* --------------------------
-     FORM submit
-  ---------------------------*/
+  /* FORM submit */
   form.addEventListener("submit", async (e)=>{
     e.preventDefault();
     btnSubmit.disabled = true;
-    btnSubmit.innerText = "Enviando...";
+    btnSubmit.innerText = "Processando...";
 
     try {
       const payload = {
@@ -289,48 +302,38 @@ Timestamp: ${payload.timestamp}
         observacao: observacao.value.trim()
       };
 
-      // validação mínima
-      if (!payload.nome || !payload.matricula || !payload.datauso) {
-        alert("Preencha os campos obrigatórios (Nome, Matrícula, Data do uso).");
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = "Enviar (E-mail + CSV)";
-        return;
-      }
-
       const csv = gerarCSVString(payload);
-      const nomeSanit = slugifyName(payload.nome || "usuario");
+      const nomeSanit = slugifyName(payload.nome || "func");
       const dataCurta = payload.timestamp.slice(0,10);
-      const csvFilename = `prestacao_${nomeSanit}_${dataCurta}.csv`;
+      const csvFilename = `ADD_${nomeSanit}_${dataCurta}.csv`;
 
+      // 1. Baixar CSV (Garantia)
       const csvUrl = baixarCSV(csv, csvFilename);
 
-      // enviar email - pode falhar se template/service não existir ou campos diferentes
+      // 2. Tentar Email
+      btnSubmit.innerText = "Enviando E-mail...";
       try {
         await enviarEmailEmailJS(payload, csv, csvUrl, csvFilename);
-        alert("E-mail enviado com sucesso 👍 (e CSV baixado).");
+        alert("Sucesso! E-mail enviado e arquivo salvo.");
       } catch (err) {
-        console.error("Erro ao enviar email via EmailJS:", err);
-        alert("Falha ao enviar e-mail. Verifique console e configuração do EmailJS.");
+        console.error(err);
+        alert("Atenção: O CSV foi baixado no seu dispositivo, mas houve erro ao enviar o e-mail automático.");
       }
 
-      // liberar objectURL depois de alguns segundos
-      setTimeout(()=> {
-        try { URL.revokeObjectURL(csvUrl); } catch(e){/*ignore*/}
-      }, 8000);
-
-      // opcional: resetar form
+      setTimeout(()=> { try { URL.revokeObjectURL(csvUrl); } catch(e){} }, 8000);
       form.reset();
+      btnGeo.innerText = "Obter Localização";
+      btnGeo.style.background = "#1e88e5";
 
     } catch (err) {
       console.error(err);
-      alert("Ocorreu um erro. Veja console para detalhes.");
+      alert("Erro fatal no formulário.");
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.innerText = "Enviar (E-mail + CSV)";
     }
   });
-
-}); // DOMContentLoaded
+});
 </script>
 </body>
 </html>
