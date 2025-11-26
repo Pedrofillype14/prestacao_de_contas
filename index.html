@@ -98,41 +98,22 @@
       <label>Observação sobre a refeição (opcional)</label>
       <textarea id="observacao" rows="3"></textarea>
 
-      <button id="btnSubmit" type="submit">Enviar (E-mail + CSV + Excel opcional)</button>
+      <button id="btnSubmit" type="submit">Enviar (E-mail + CSV)</button>
       <p class="muted">O e-mail será enviado para: <b>pedro.fillype@energisa.com.br</b></p>
     </form>
   </div>
 
 <script>
 /* --------------------------
-  CONFIGURE ESTES VALORES
-  --------------------------
-  - EMAILJS: crie uma conta em https://www.emailjs.com/ e substitua abaixo
-    - EMAILJS_USER_ID: seu user id (public key)
-    - EMAILJS_SERVICE_ID: seu service id (ex: service_xxx)
-    - EMAILJS_TEMPLATE_ID: template que você cria no painel EmailJS
-  - MICROSOFT GRAPH (OPCIONAL): para envio ao Excel no OneDrive
-    - GRAPH_TOKEN: Bearer token com permissões Files.ReadWrite / Sites.ReadWrite.All
-    - GRAPH_FILE_ID: ID do arquivo Excel no seu OneDrive (consulte via Graph Explorer)
-    - GRAPH_TABLE_NAME: nome da tabela no Excel (ex: Tabela1)
-  ---------------------------------------------------- */
-
+ CONFIG: EmailJS
+---------------------------*/
 const CONFIG = {
   EMAILJS_USER_ID: "service_915mowg",
   EMAILJS_SERVICE_ID: "service_915mowg",
   EMAILJS_TEMPLATE_ID: "template_lirn629",
-  // Template variables usados no template do EmailJS: subject, plain_body, html_body, csv_content, filename, to_email
-  EMAIL_TO: "pedro.fillype@energisa.com.br",
-
-  // Microsoft Graph (opcional)
-  GRAPH_TOKEN: "",           // ex: "eyJ0eXAiOiJKV1QiLCJhbG..."
-  GRAPH_FILE_ID: "",         // id do arquivo no OneDrive
-  GRAPH_TABLE_NAME: "Tabela1"// certifique-se de que a tabela no Excel se chama exatamente assim
+  EMAIL_TO: "pedro.fillype@energisa.com.br"
 };
 
-/* --------------------------
-  UTIL: sanitizar nome para arquivo
----------------------------*/
 function slugifyName(s) {
   return s.trim().replace(/\s+/g, "_").replace(/[^\w\-]/g, "");
 }
@@ -148,28 +129,21 @@ document.getElementById("btnGeo").addEventListener("click", () => {
     const lng = pos.coords.longitude.toFixed(6);
     document.getElementById("geo").value = `${lat}, ${lng}`;
     document.getElementById("btnGeo").innerText = "Obter Localização";
-  }, (err) => {
-    alert("Não foi possível obter localização: " + (err.message||err.code));
-    document.getElementById("btnGeo").innerText = "Obter Localização";
-  }, { enableHighAccuracy: true, timeout: 10000 });
+  });
 });
 
-
 /* --------------------------
-  GERAÇÃO CSV
+  CSV
 ---------------------------*/
 function gerarCSVString(obj) {
-  // Colunas: timestamp,nome,regional,polo,matricula,datauso,tiporefeicao,horario,localidade,localizacao_gps,sequencia,osrrss,numeroadd,observacao
   const headers = ["timestamp","nome","regional","polo","matricula","datauso","tiporefeicao","horario","localidade","localizacao_gps","sequencia","osrrss","numeroadd","observacao"];
   const linha = [
-    obj.timestamp, obj.nome, obj.regional, obj.polo, obj.matricula, obj.datauso,
-    obj.tiporefeicao, obj.horario, obj.localidade, obj.localizacao_gps, obj.sequencia,
-    obj.osrrss, obj.numeroadd, obj.observacao
+    obj.timestamp,obj.nome,obj.regional,obj.polo,obj.matricula,obj.datauso,
+    obj.tiporefeicao,obj.horario,obj.localidade,obj.localizacao_gps,obj.sequencia,
+    obj.osrrss,obj.numeroadd,obj.observacao
   ];
-  // Encapsula em aspas e escapa aspas internas
-  function q(v){ if (v===null||v===undefined) return ""; return '"'+String(v).replace(/"/g,'""')+'"'; }
-  const csv = headers.map(q).join(",") + "\\n" + linha.map(q).join(",");
-  return csv;
+  const q = v => `"${String(v).replace(/"/g,'""')}"`;
+  return headers.map(q).join(",") + "\n" + linha.map(q).join(",");
 }
 
 function baixarCSV(csvString, filename) {
@@ -178,36 +152,24 @@ function baixarCSV(csvString, filename) {
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
-  document.body.appendChild(a);
   a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  return url; // retorna URL para uso em email (link temporário na sessão atual)
+  return url;
 }
 
 /* --------------------------
-  ENVIAR E-MAIL (EmailJS)
-  - envia o texto simples + html + csv como texto no corpo
-  - também inclui um link temporário para download do CSV (URL.createObjectURL)
-  ---------------------------*/
+  E-MAIL via EmailJS
+---------------------------*/
 async function enviarEmailEmailJS(payload, csvString, csvUrl, csvFilename) {
-  if (!CONFIG.EMAILJS_USER_ID || !CONFIG.EMAILJS_SERVICE_ID || !CONFIG.EMAILJS_TEMPLATE_ID) {
-    console.warn("EmailJS não configurado (placeholders). Pulando envio de e-mail via EmailJS.");
-    return {ok:false, reason:"emailjs_not_configured"};
-  }
-
-  // Carrega SDK EmailJS dinamicamente (se não presente)
   if (!window.emailjs) {
-    await new Promise((res,rej)=>{
-      const script = document.createElement("script");
-      script.src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
-      script.onload = res; script.onerror = ()=>rej("Erro ao carregar EmailJS");
-      document.head.appendChild(script);
+    await new Promise(res=>{
+      const sc=document.createElement("script");
+      sc.src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+      sc.onload=res;
+      document.head.appendChild(sc);
     });
     emailjs.init(CONFIG.EMAILJS_USER_ID);
   }
 
-  // Monta corpo simples e html
   const plain = `
 Nova prestação de contas registrada:
 
@@ -224,139 +186,68 @@ Sequência: ${payload.sequencia}
 OS/RR/SS: ${payload.osrrss}
 Número do ADD: ${payload.numeroadd}
 Observação: ${payload.observacao}
-Timestamp (envio): ${payload.timestamp}
-  `.trim();
+Timestamp: ${payload.timestamp}
+  `;
 
   const html = `
-  <div style="font-family:Arial,Helvetica,sans-serif;color:#222">
-    <h2 style="color:#0d47a1">Nova prestação de contas - ADD</h2>
-    <table style="border-collapse:collapse">
-      <tbody>
-        ${Object.entries(payload).map(([k,v])=>{
-          return `<tr><td style="padding:6px 10px;font-weight:600;border:1px solid #eee">${k}</td><td style="padding:6px 10px;border:1px solid #eee">${String(v)}</td></tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-    <p>CSV (conteúdo abaixo):</p>
-    <pre style="white-space:pre-wrap;background:#f7f7f7;padding:10px;border-radius:6px">${csvString}</pre>
-    <p>Link para download temporário (apenas nesta sessão): <a href="${csvUrl}" target="_blank">${csvFilename}</a></p>
+  <div style="font-family:Arial">
+    <h2>Nova prestação de contas - ADD</h2>
+    <pre>${plain}</pre>
+    <p>CSV gerado:</p>
+    <pre>${csvString}</pre>
+    <p>Download do CSV: <a href="${csvUrl}" target="_blank">${csvFilename}</a></p>
   </div>
   `;
 
-  // templateParams deve refletir as variáveis do template do EmailJS que você criou
-  const templateParams = {
+  return emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
     to_email: CONFIG.EMAIL_TO,
     subject: `Prestação ADD - ${payload.nome} - ${payload.datauso}`,
     plain_body: plain,
     html_body: html,
     csv_content: csvString,
     filename: csvFilename
-  };
-
-  try {
-    const res = await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, templateParams);
-    console.log("EmailJS resposta:", res);
-    return {ok:true, res};
-  } catch (err) {
-    console.error("Erro EmailJS:", err);
-    return {ok:false, err};
-  }
+  });
 }
 
 /* --------------------------
-  ENVIAR PARA EXCEL (Microsoft Graph) - OPCIONAL
-  - requer GRAPH_TOKEN e GRAPH_FILE_ID corretamente preenchidos no CONFIG
-  - a tabela Excel precisa existir e ter nome (CONFIG.GRAPH_TABLE_NAME)
+   SUBMIT
 ---------------------------*/
-async function enviarParaExcelGraph(payload) {
-  if (!CONFIG.GRAPH_TOKEN || !CONFIG.GRAPH_FILE_ID) {
-    console.warn("Graph não configurado. Pule se não quiser enviar para Excel.");
-    return {ok:false, reason:"graph_not_configured"};
-  }
-
-  const fileId = CONFIG.GRAPH_FILE_ID;
-  const token = CONFIG.GRAPH_TOKEN;
-  // Monta a linha na mesma ordem das colunas da planilha
-  const row = [
-    payload.timestamp, payload.nome, payload.regional, payload.polo, payload.matricula,
-    payload.datauso, payload.tiporefeicao, payload.horario, payload.localidade, payload.localizacao_gps,
-    payload.sequencia, payload.osrrss, payload.numeroadd, payload.observacao
-  ];
-
-  const url = `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/workbook/worksheets('Dados')/tables('${CONFIG.GRAPH_TABLE_NAME}')/rows/add`;
-
-  try {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
-      body: JSON.stringify({ values: [row] })
-    });
-    const json = await r.json();
-    if (!r.ok) throw json;
-    console.log("Graph resposta:", json);
-    return {ok:true, json};
-  } catch (err) {
-    console.error("Erro Graph:", err);
-    return {ok:false, err};
-  }
-}
-
-/* --------------------------
-  FORM SUBMIT: orquestra tudo
----------------------------*/
-document.getElementById("addForm").addEventListener("submit", async function(e){
+document.getElementById("addForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
   const btn = document.getElementById("btnSubmit");
   btn.disabled = true; btn.innerText = "Enviando...";
 
-  // coleta dados
   const payload = {
     timestamp: new Date().toISOString(),
-    nome: document.getElementById("nome").value || "",
-    regional: document.getElementById("regional").value || "",
-    polo: document.getElementById("polo").value || "",
-    matricula: document.getElementById("matricula").value || "",
-    datauso: document.getElementById("datauso").value || "",
-    tiporefeicao: document.getElementById("tiporefeicao").value || "",
-    horario: document.getElementById("horario").value || "",
-    localidade: document.getElementById("localidade").value || "",
-    localizacao_gps: document.getElementById("geo").value || "",
-    sequencia: document.getElementById("sequencia").value || "",
-    osrrss: document.getElementById("osrrss").value || "",
-    numeroadd: document.getElementById("numeroadd").value || "",
-    observacao: document.getElementById("observacao").value || ""
+    nome: nome.value,
+    regional: regional.value,
+    polo: polo.value,
+    matricula: matricula.value,
+    datauso: datauso.value,
+    tiporefeicao: tiporefeicao.value,
+    horario: horario.value,
+    localidade: localidade.value,
+    localizacao_gps: geo.value,
+    sequencia: sequencia.value,
+    osrrss: osrrss.value,
+    numeroadd: numeroadd.value,
+    observacao: observacao.value
   };
 
-  // gera CSV
   const csv = gerarCSVString(payload);
 
-  // nome do arquivo: prestacao_<nome>_<data>.csv  (escolheu letra C)
-  const nomeSanit = slugifyName(payload.nome || "sem_nome");
-  const dataCurta = (new Date()).toISOString().slice(0,10);
+  const nomeSanit = slugifyName(payload.nome);
+  const dataCurta = payload.timestamp.slice(0,10);
   const csvFilename = `prestacao_${nomeSanit}_${dataCurta}.csv`;
 
-  // baixa automaticamente (opcional)
   const csvUrl = baixarCSV(csv, csvFilename);
 
-  // 1) enviar para Excel via Graph (opcional)
-  const graphResult = await enviarParaExcelGraph(payload);
+  await enviarEmailEmailJS(payload, csv, csvUrl, csvFilename);
 
-  // 2) enviar e-mail via EmailJS (texto simples + html + csv)
-  const emailResult = await enviarEmailEmailJS(payload, csv, csvUrl, csvFilename);
+  alert("E-mail enviado com sucesso 👍");
 
-  // final
   btn.disabled = false;
-  btn.innerText = "Enviar (E-mail + CSV + Excel opcional)";
-
-  let mensagens = [];
-  if (emailResult && emailResult.ok) mensagens.push("E-mail enviado com sucesso.");
-  else if (emailResult && emailResult.reason==="emailjs_not_configured") mensagens.push("E-mail não enviado (EmailJS não configurado).");
-  else mensagens.push("Falha ao enviar e-mail.");
-
-  if (graphResult && graphResult.ok) mensagens.push("Linha adicionada no Excel via Graph.");
-  else mensagens.push("Excel (Graph) não enviado/sem configuração.");
-
-  alert(mensagens.join("\\n"));
+  btn.innerText = "Enviar (E-mail + CSV)";
 });
 </script>
 </body>
