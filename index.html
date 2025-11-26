@@ -16,6 +16,20 @@
   @media(max-width:720px){.row{grid-template-columns:1fr}}
   .small{padding:8px;font-size:13px}
   .muted{color:#666;font-size:13px;text-align:center}
+  .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;              /* antes era 10px — reduz o espaço */
+  margin-bottom: -4px;   /* remove espaço vertical entre blocos */
+}
+
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 0;
+  }
+}
 </style>
 </head>
 <body>
