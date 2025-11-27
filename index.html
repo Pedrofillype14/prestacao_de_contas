@@ -215,18 +215,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
       const arquivoBase64 = btoa(unescape(encodeURIComponent(csv)));
       const arquivoNome = `ADD_${payload.nome}.csv`;
 
-      // ENVIA PARA SEU WORKER
       const res = await fetch("https://long-hall-0aaa.pedro-fillype.workers.dev", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...payload,
-          arquivoNome,
-          arquivoBase64
-        })
-      });
-
-      const data = await res.json();
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+           nome: "Pedro",
+           email: "pedro.fillype@energisa.com.br",
+           mensagem: "teste",
+           arquivoNome: "teste.csv",
+           arquivoBase64: "BASE64_AQUI"
+         })
+       });
+     const data = await res.json();
+     console.log("Resposta do worker:", data);
 
       if(data.id){
         alert("Sucesso! E-mail enviado com o CSV anexado.");
