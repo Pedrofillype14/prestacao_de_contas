@@ -44,23 +44,29 @@
 <div class="card">
   <h1>PRESTAÇÃO DE CONTAS - ADD</h1>
 
-  <form id="addForm" autocomplete="off">
-    
+  <!-- FORMULÁRIO USANDO WEB3FORMS -->
+  <form id="addForm" autocomplete="off" method="POST" action="https://api.web3forms.com/submit" enctype="multipart/form-data">
+
+    <input type="hidden" name="access_key" value="89885c8d-355e-4b5f-8fe6-d2dfd2e7aff9">
+    <input type="hidden" name="subject" value="Prestação de Contas - ADD">
+    <input type="hidden" name="redirect" value="https://web3forms.com/success">
+
     <div>
       <label>Nome *</label>
-      <input id="nome" type="text" required>
+      <input id="nome" name="nome" type="text" required>
     </div>
 
     <div class="row">
       <div>
         <label>Regional *</label>
-        <select id="regional" required>
-          <option value="">Selecione...</option><option>LESTE</option><option>CENTRO</option><option>OESTE</option>
+        <select id="regional" name="regional" required>
+          <option value="">Selecione...</option>
+          <option>LESTE</option><option>CENTRO</option><option>OESTE</option>
         </select>
       </div>
       <div>
         <label>Polo *</label>
-        <select id="polo" required>
+        <select id="polo" name="polo" required>
           <option value="">Selecione...</option>
           <option>João Pessoa</option><option>Itabaiana</option><option>Mamanguape</option><option>Borborema</option>
           <option>Campina Grande</option><option>Monteiro</option><option>Guarabira</option><option>Esperança</option>
@@ -72,18 +78,18 @@
     <div class="row">
       <div>
         <label>Matrícula *</label>
-        <input id="matricula" type="text" required>
+        <input id="matricula" name="matricula" type="text" required>
       </div>
       <div>
         <label>Data do uso *</label>
-        <input id="datauso" type="date" required>
+        <input id="datauso" name="datauso" type="date" required>
       </div>
     </div>
 
     <div class="row">
       <div>
         <label>Tipo de Refeição *</label>
-        <select id="tiporefeicao" required>
+        <select id="tiporefeicao" name="tiporefeicao" required>
           <option value="">Selecione...</option>
           <option>ALMOÇO</option><option>JANTA</option>
           <option>EXTRA (APÓS DUAS HORAS DO FINAL DA ESCALA)</option>
@@ -91,13 +97,13 @@
       </div>
       <div>
         <label>Horário *</label>
-        <input id="horario" type="time" required>
+        <input id="horario" name="horario" type="time" required>
       </div>
     </div>
 
     <div>
       <label>Localidade em que foi usado o ADD *</label>
-      <input id="localidade" type="text" required>
+      <input id="localidade" name="localidade" type="text" required>
     </div>
 
     <div class="row">
@@ -107,30 +113,33 @@
       </div>
       <div>
         <label>Coordenadas *</label>
-        <input id="geo" type="text" placeholder="lat, lng" readonly required>
+        <input id="geo" name="localizacao_gps" type="text" placeholder="lat, lng" readonly required>
       </div>
     </div>
 
     <div>
       <label>Sequência do ADD (opcional)</label>
-      <input id="sequencia" type="text">
+      <input id="sequencia" name="sequencia" type="text">
     </div>
 
     <div class="row">
       <div>
         <label>Número da OS / RR / SS (opcional)</label>
-        <input id="osrrss" type="text">
+        <input id="osrrss" name="osrrss" type="text">
       </div>
       <div>
         <label>Número do ADD (opcional)</label>
-        <input id="numeroadd" type="text">
+        <input id="numeroadd" name="numeroadd" type="text">
       </div>
     </div>
 
     <div>
       <label>Observação sobre a refeição (opcional)</label>
-      <textarea id="observacao" rows="3"></textarea>
+      <textarea id="observacao" name="observacao" rows="3"></textarea>
     </div>
+
+    <!-- ONDE O CSV SERÁ ANEXADO -->
+    <input type="file" id="csvfile" name="csvfile" style="display:none">
 
     <button id="btnSubmit" type="submit" style="margin-top:10px">
       Enviar (E-mail + CSV)
@@ -141,21 +150,30 @@
 </div>
 
 <script>
-/* --------------------------
- CONFIG EmailJS
----------------------------*/
-const CONFIG = {
-  EMAILJS_USER_ID: "DOOkPk4Rqm1NZhIWO",
-  EMAILJS_SERVICE_ID: "service_915mowg",
-  EMAILJS_TEMPLATE_ID: "template_lirn629",
-  EMAIL_TO: "pedro.fillype@energisa.com.br"
-};
-
 function slugifyName(s){return String(s||"").trim().replace(/\s+/g,"_").replace(/[^\w\-]/g,"");}
 
-/* Converte CSV → Base64 */
-function csvToBase64(str){
-  return btoa(unescape(encodeURIComponent(str)));
+function gerarCSV(obj){
+  const headers = ["timestamp","nome","regional","polo","matricula","datauso",
+    "tiporefeicao","horario","localidade","localizacao_gps","sequencia",
+    "osrrss","numeroadd","observacao"];
+
+  const linha = [
+    obj.timestamp,obj.nome,obj.regional,obj.polo,obj.matricula,obj.datauso,
+    obj.tiporefeicao,obj.horario,obj.localidade,obj.localizacao_gps,obj.sequencia,
+    obj.osrrss,obj.numeroadd,obj.observacao
+  ];
+
+  const q = v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  return headers.map(q).join(",") + "\n" + linha.map(q).join(",");
+}
+
+function baixarCSV(csvString,filename){
+  const blob=new Blob(["\uFEFF"+csvString],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=filename;document.body.appendChild(a);
+  a.click();a.remove();
+  return blob;
 }
 
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -164,7 +182,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const btnGeo = document.getElementById("btnGeo");
   const btnSubmit = document.getElementById("btnSubmit");
 
-  /* Campos */
   const nome = document.getElementById("nome");
   const regional = document.getElementById("regional");
   const polo = document.getElementById("polo");
@@ -178,8 +195,8 @@ document.addEventListener("DOMContentLoaded", ()=>{
   const osrrss = document.getElementById("osrrss");
   const numeroadd = document.getElementById("numeroadd");
   const observacao = document.getElementById("observacao");
+  const csvfile = document.getElementById("csvfile");
 
-  /* GEOLOCATION */
   btnGeo.addEventListener("click", ()=>{
     if(!navigator.geolocation){ alert("Geolocalização não suportada."); return; }
     btnGeo.innerText="Capturando...";
@@ -195,128 +212,51 @@ document.addEventListener("DOMContentLoaded", ()=>{
     },{enableHighAccuracy:true,timeout:10000});
   });
 
-  /* CSV */
-  function gerarCSV(obj){
-    const headers = ["timestamp","nome","regional","polo","matricula","datauso",
-      "tiporefeicao","horario","localidade","localizacao_gps","sequencia",
-      "osrrss","numeroadd","observacao"];
-
-    const linha = [
-      obj.timestamp,obj.nome,obj.regional,obj.polo,obj.matricula,obj.datauso,
-      obj.tiporefeicao,obj.horario,obj.localidade,obj.localizacao_gps,obj.sequencia,
-      obj.osrrss,obj.numeroadd,obj.observacao
-    ];
-
-    const q = v=>`"${String(v??"").replace(/"/g,'""')}"`;
-    return headers.map(q).join(",") + "\n" + linha.map(q).join(",");
-  }
-
-  /* Baixar CSV */
-  function baixarCSV(csvString,filename){
-    const blob=new Blob(["\uFEFF"+csvString],{type:"text/csv;charset=utf-8;"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=url;a.download=filename;document.body.appendChild(a);
-    a.click();a.remove();
-    return url;
-  }
-
-  /* Carrega EmailJS */
-  let emailjsReady=false;
-  async function ensureEmailJS(){
-    if(emailjsReady&&window.emailjs) return;
-    if(!window.emailjs){
-      await new Promise(res=>{
-        const s=document.createElement("script");
-        s.src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
-        s.onload=res;
-        document.head.appendChild(s);
-      });
-    }
-    if(window.emailjs && !emailjsReady){
-      emailjs.init(CONFIG.EMAILJS_USER_ID);
-      emailjsReady=true;
-    }
-  }
-
-  /* Enviar e-mail com ANEXO */
-  async function enviarEmail(payload, csvString, csvFilename){
-    await ensureEmailJS();
-    const base64 = csvToBase64(csvString);
-
-    return emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
-      to_email: CONFIG.EMAIL_TO,
-      subject: `ADD - ${payload.nome} - ${payload.datauso}`,
-      message: `
-        Nome: ${payload.nome}
-        Matrícula: ${payload.matricula}
-        Data: ${payload.datauso}
-        Regional: ${payload.regional} | Polo: ${payload.polo}
-        Refeição: ${payload.tiporefeicao} (${payload.horario})
-        Local: ${payload.localidade}
-        GPS: ${payload.localizacao_gps}
-      `,
-
-      attachment: base64,
-      attachment_filename: csvFilename,
-      attachment_format: "base64"
-    });
-  }
-
-  /* SUBMIT */
-  form.addEventListener("submit", async e=>{
+  form.addEventListener("submit", e=>{
     e.preventDefault();
+
     btnSubmit.disabled=true;
     btnSubmit.innerText="Processando...";
 
-    try{
-      const payload = {
-        timestamp:new Date().toISOString(),
-        nome:nome.value.trim(),
-        regional:regional.value,
-        polo:polo.value,
-        matricula:matricula.value.trim(),
-        datauso:datauso.value,
-        tiporefeicao:tiporefeicao.value,
-        horario:horario.value,
-        localidade:localidade.value.trim(),
-        localizacao_gps:geo.value,
-        sequencia:sequencia.value.trim(),
-        osrrss:osrrss.value.trim(),
-        numeroadd:numeroadd.value.trim(),
-        observacao:observacao.value.trim()
-      };
+    const payload = {
+      timestamp:new Date().toISOString(),
+      nome:nome.value.trim(),
+      regional:regional.value,
+      polo:polo.value,
+      matricula:matricula.value.trim(),
+      datauso:datauso.value,
+      tiporefeicao:tiporefeicao.value,
+      horario:horario.value,
+      localidade:localidade.value.trim(),
+      localizacao_gps:geo.value,
+      sequencia:sequencia.value.trim(),
+      osrrss:osrrss.value.trim(),
+      numeroadd:numeroadd.value.trim(),
+      observacao:observacao.value.trim()
+    };
 
-      const csv = gerarCSV(payload);
-      const nomeSanit = slugifyName(payload.nome||"func");
-      const dataCurta = payload.timestamp.slice(0,10);
-      const filename = `ADD_${nomeSanit}_${dataCurta}.csv`;
+    const csv = gerarCSV(payload);
+    const filename = `ADD_${slugifyName(payload.nome)}_${payload.timestamp.slice(0,10)}.csv`;
 
-      const url = baixarCSV(csv, filename);
+    const blob = baixarCSV(csv, filename);
 
-      btnSubmit.innerText="Enviando E-mail...";
+    // Anexa o CSV ao formulário
+    const file = new File([blob], filename, { type: "text/csv" });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    csvfile.files = dataTransfer.files;
 
-      try{
-        await enviarEmail(payload, csv, filename);
-        alert("Sucesso! CSV enviado como anexo e também baixado.");
-      }catch(e){
-        alert("CSV foi baixado, mas houve erro ao enviar o e-mail.");
-      }
+    // agora envia de verdade pelo Web3Forms:
+    form.submit();
 
-      form.reset();
-      btnGeo.innerText="Obter Localização";
-      btnGeo.style.background="#1e88e5";
-      URL.revokeObjectURL(url);
-
-    }catch(e){
-      alert("Erro inesperado.");
-    }finally{
+    setTimeout(()=>{
       btnSubmit.disabled=false;
       btnSubmit.innerText="Enviar (E-mail + CSV)";
-    }
+    },2000);
   });
 
 });
 </script>
+
 </body>
 </html>
