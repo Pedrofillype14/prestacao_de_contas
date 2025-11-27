@@ -1,147 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Prestação de Contas - ADD</title>
-
-<style>
-  * { box-sizing: border-box; } 
-  body{font-family:"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#e3f2fd,#fff);
-       padding:24px;color:#333;margin:0;}
-  .card{max-width:900px;margin:18px auto;padding:20px;border-radius:12px;background:#fff;
-        box-shadow:0 6px 20px rgba(0,0,0,0.08);}
-  h1{text-align:center;color:#0d47a1;margin:6px 0 12px;font-size:20px;text-transform:uppercase;}
-  form{display:grid;gap:10px;}
-  label{font-weight:600;font-size:14px;margin-bottom:4px;display:block;}
-
-  input,select,textarea,button{
-    width:100%;padding:12px;border-radius:8px;border:1px solid #cfd8dc;
-    background:#f7f9fc;font-size:15px;outline:none;
-  }
-  input:focus,select:focus,textarea:focus{border-color:#1e88e5;background:#fff;}
-
-  button{background:#1e88e5;color:#fff;border:none;cursor:pointer;font-weight:700;transition:0.3s;}
-  button:hover{background:#1565c0;}
-
-  .row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
-    margin-bottom:2px;
-  }
-  @media(max-width:720px){
-    .row{grid-template-columns:1fr;gap:10px;}
-    body{padding:12px;}
-  }
-
-  .small{padding:8px;font-size:13px}
-  .muted{color:#666;font-size:13px;text-align:center}
-</style>
-</head>
-<body>
-
-<div class="card">
-  <h1>PRESTAÇÃO DE CONTAS - ADD</h1>
-
-  <form id="addForm" autocomplete="off">
-
-    <div>
-      <label>Nome *</label>
-      <input id="nome" name="nome" type="text" required>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Regional *</label>
-        <select id="regional" name="regional" required>
-          <option value="">Selecione...</option><option>LESTE</option><option>CENTRO</option><option>OESTE</option>
-        </select>
-      </div>
-      <div>
-        <label>Polo *</label>
-        <select id="polo" name="polo" required>
-          <option value="">Selecione...</option>
-          <option>João Pessoa</option><option>Itabaiana</option><option>Mamanguape</option><option>Borborema</option>
-          <option>Campina Grande</option><option>Monteiro</option><option>Guarabira</option><option>Esperança</option>
-          <option>Itaporanga</option><option>Sousa</option><option>Patos</option><option>Catolé do Rocha</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Matrícula *</label>
-        <input id="matricula" name="matricula" type="text" required>
-      </div>
-      <div>
-        <label>Data do uso *</label>
-        <input id="datauso" name="datauso" type="date" required>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Tipo de Refeição *</label>
-        <select id="tiporefeicao" name="tiporefeicao" required>
-          <option value="">Selecione...</option>
-          <option>ALMOÇO</option><option>JANTA</option>
-          <option>EXTRA (APÓS DUAS HORAS DO FINAL DA ESCALA)</option>
-        </select>
-      </div>
-      <div>
-        <label>Horário *</label>
-        <input id="horario" name="horario" type="time" required>
-      </div>
-    </div>
-
-    <div>
-      <label>Localidade em que foi usado o ADD *</label>
-      <input id="localidade" name="localidade" type="text" required>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Solicitar localização geográfica *</label>
-        <button type="button" id="btnGeo" class="small">Obter Localização</button>
-      </div>
-      <div>
-        <label>Coordenadas *</label>
-        <input id="geo" name="localizacao_gps" type="text" placeholder="lat, lng" readonly required>
-      </div>
-    </div>
-
-    <div>
-      <label>Sequência do ADD (opcional)</label>
-      <input id="sequencia" name="sequencia" type="text">
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Número da OS / RR / SS (opcional)</label>
-        <input id="osrrss" name="osrrss" type="text">
-      </div>
-      <div>
-        <label>Número do ADD (opcional)</label>
-        <input id="numeroadd" name="numeroadd" type="text">
-      </div>
-    </div>
-
-    <div>
-      <label>Observação sobre a refeição (opcional)</label>
-      <textarea id="observacao" name="observacao" rows="3"></textarea>
-    </div>
-
-    <button id="btnSubmit" type="submit" style="margin-top:10px">
-      Enviar (E-mail + CSV)
-    </button>
-
-    <p class="muted">O e-mail será enviado via seu Worker (Cloudflare).</p>
-  </form>
-</div>
-
 <script>
-
 document.addEventListener("DOMContentLoaded", ()=>{
 
   const form = document.getElementById("addForm");
@@ -172,75 +29,101 @@ document.addEventListener("DOMContentLoaded", ()=>{
       geo.value = `${lat}, ${lng}`;
       btnGeo.innerText="Localização OK!";
       btnGeo.style.background="#43a047";
-    },()=>{
+    },(err)=>{
+      console.error("geolocation error:", err);
       alert("Ative o GPS e tente novamente.");
       btnGeo.innerText="Obter Localização";
     },{enableHighAccuracy:true,timeout:10000});
   });
 
-  /* CSV */
+  /* Gera CSV simples (mesma função sua) */
   function gerarCSV(obj){
     const headers = Object.keys(obj);
     const values  = Object.values(obj);
-
     const q = v=>`"${String(v??"").replace(/"/g,'""')}"`;
     return headers.map(q).join(",") + "\n" + values.map(q).join(",");
   }
 
-  /* SUBMIT */
+  /* SUBMIT - usa FormData (envia arquivo real) e logs detalhados */
   form.addEventListener("submit", async e=>{
     e.preventDefault();
     btnSubmit.disabled=true;
     btnSubmit.innerText="Processando...";
 
     try{
+      // --- cria payload
       const payload = {
-        nome:nome.value.trim(),
-        regional:regional.value,
-        polo:polo.value,
-        matricula:matricula.value.trim(),
-        data:datauso.value,
-        tiporefeicao:tiporefeicao.value,
-        horario:horario.value,
-        localidade:localidade.value.trim(),
-        gps:geo.value,
-        sequencia:sequencia.value.trim(),
-        osrrss:osrrss.value.trim(),
-        numeroadd:numeroadd.value.trim(),
-        observacao:observacao.value.trim()
+        nome: nome.value.trim(),
+        regional: regional.value,
+        polo: polo.value,
+        matricula: matricula.value.trim(),
+        datauso: datauso.value,
+        tiporefeicao: tiporefeicao.value,
+        horario: horario.value,
+        localidade: localidade.value.trim(),
+        gps: geo.value,
+        sequencia: sequencia.value.trim(),
+        osrrss: osrrss.value.trim(),
+        numeroadd: numeroadd.value.trim(),
+        observacao: observacao.value.trim()
       };
 
-      // GERA CSV → base64
+      // --- gera csv (texto)
       const csv = gerarCSV(payload);
-      const arquivoBase64 = btoa(unescape(encodeURIComponent(csv)));
-      const arquivoNome = `ADD_${payload.nome}.csv`;
+      const csvFilename = `ADD_${payload.nome.replace(/\s+/g,"_") || "anonimo"}_${(new Date()).toISOString().slice(0,10)}.csv`;
+      const csvBlob = new Blob([csv], { type: "text/csv" });
 
-      const res = await fetch("https://long-hall-0aaa.pedro-fillype.workers.dev", {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({
-           nome: "Pedro",
-           email: "pedro.fillype@energisa.com.br",
-           mensagem: "teste",
-           arquivoNome: "teste.csv",
-           arquivoBase64: "BASE64_AQUI"
-         })
-       });
-     const data = await res.json();
-     console.log("Resposta do worker:", data);
+      // --- monta FormData para enviar ao Worker (melhor: evita base64 no cliente)
+      const fd = new FormData();
+      // campos individuais (facilita debug no Worker)
+      Object.entries(payload).forEach(([k,v]) => fd.append(k, v ?? ""));
+      // anexa o arquivo real
+      fd.append("arquivo", new File([csvBlob], csvFilename, { type: "text/csv" }));
 
-      if(data.id){
-        alert("Sucesso! E-mail enviado com o CSV anexado.");
-        form.reset();
-        btnGeo.innerText="Obter Localização";
-        btnGeo.style.background="#1e88e5";
-      } else {
-        alert("Erro ao enviar: " + JSON.stringify(data));
+      // --- opcional: inspeciona FormData (DEBUG) - não funciona em todos navegadores para ler file contents
+      console.log("FormData entries (nome, matricula, ...):");
+      for (const pair of fd.entries()) {
+        if (pair[1] instanceof File) {
+          console.log(pair[0], "(file):", pair[1].name, pair[1].size, pair[1].type);
+        } else {
+          console.log(pair[0], ":", pair[1]);
+        }
       }
 
-    }catch(e){
-      alert("Erro inesperado.");
-    }finally{
+      // --- faça a chamada ao Worker (sua URL)
+      const workerUrl = "https://long-hall-0aaa.pedro-fillype.workers.dev"; // sua URL
+      const resp = await fetch(workerUrl, {
+        method: "POST",
+        body: fd // Content-Type automaticamente multipart/form-data
+      });
+
+      // lê resposta bruta (texto) para depurar
+      const text = await resp.text();
+      let parsed;
+      try { parsed = JSON.parse(text); } catch(e){ parsed = null; }
+
+      console.log("Worker response status:", resp.status);
+      console.log("Worker response body:", parsed ?? text);
+
+      if (!resp.ok) {
+        // mostra erro detalhado para o usuário e console
+        alert("Erro no servidor: " + (parsed?.error || parsed?.message || text || resp.status));
+        btnSubmit.disabled=false;
+        btnSubmit.innerText="Enviar (E-mail + CSV)";
+        return;
+      }
+
+      // sucesso
+      alert("Enviado com sucesso! Verifique seu e-mail.");
+      form.reset();
+      btnGeo.innerText="Obter Localização";
+      btnGeo.style.background="#1e88e5";
+
+    } catch (err) {
+      console.error("Erro no submit:", err);
+      // mostra mensagem com detalhe para ajudar debugging
+      alert("Erro inesperado. Veja console (F12) para detalhes: " + (err && err.message ? err.message : err));
+    } finally {
       btnSubmit.disabled=false;
       btnSubmit.innerText="Enviar (E-mail + CSV)";
     }
@@ -248,5 +131,3 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
 });
 </script>
-</body>
-</html>
