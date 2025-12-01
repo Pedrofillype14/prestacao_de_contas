@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       Object.entries(payload).forEach(([k,v]) => fd.append(k, v ?? ""));
       fd.append("arquivo", new File([csvBlob], csvFilename, { type: "text/csv" }));
 
-      const workerUrl = "https://long-hall-0aaa.pedro-fillype.workers.dev";
+      const workerUrl = "https://long-hall-0aaa.pedro-fillype.workers.dev/submit";
 
       const resp = await fetch(workerUrl, { method:"POST", body: fd });
       const txt = await resp.text();
