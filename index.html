@@ -258,6 +258,21 @@ document.addEventListener("DOMContentLoaded", () => {
     matricula.style.background = "#e9ecef";
     matricula.style.cursor = "not-allowed";
 });
+    // 🔵 Buscar nome e e-mail automaticamente
+fetch(`https://long-hall-0aaa.pedro-fillype.workers.dev/usuario?matricula=${usuarioLogado}`)
+  .then(r => r.json())
+  .then(data => {
+    if (data.nome) {
+      document.getElementById("nome").value = data.nome;
+      document.getElementById("nome").readOnly = true;
+    }
+    if (data.email) {
+      document.getElementById("email").value = data.email;
+      document.getElementById("email").readOnly = true;
+    }
+  })
+  .catch(err => console.error("Erro carregando dados:", err));
+
 
 /* --- JS MANTIDO E MELHORADO VISUALMENTE --- */
 document.addEventListener("DOMContentLoaded", ()=>{
