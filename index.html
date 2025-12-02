@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Prestação de Contas - ADD</title>
 
-<!-- ÍCONES -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
@@ -19,12 +18,10 @@
   }
 
   * { box-sizing: border-box; }
-
   body {
     font-family: "Segoe UI", Roboto, sans-serif;
     background: var(--bg-soft);
     margin: 0;
-    padding: 0;
   }
 
   /* HEADER */
@@ -37,12 +34,7 @@
     align-items: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
-
-  .header h2 {
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
+  .header h2 { margin: 0; font-weight: 700; letter-spacing: 1px; }
 
   .logout-btn {
     background: var(--energisa-orange);
@@ -53,9 +45,7 @@
     cursor: pointer;
     font-weight: 600;
   }
-  .logout-btn:hover {
-    background: #d65c18;
-  }
+  .logout-btn:hover { background: #d65c18; }
 
   /* CARD */
   .card {
@@ -77,7 +67,6 @@
   }
 
   form { display: grid; gap: 15px; }
-
   label { font-weight: 600; margin-bottom: 4px; }
 
   input, select, textarea {
@@ -88,7 +77,6 @@
     font-size: 15px;
     background: #fdfdfd;
   }
-
   input:focus, select:focus, textarea:focus {
     border-color: var(--energisa-blue);
     box-shadow: 0 0 0 2px rgba(0,151,206,0.25);
@@ -100,12 +88,9 @@
     grid-template-columns: 1fr 1fr;
     gap: 18px;
   }
+  @media(max-width: 720px) { .row { grid-template-columns: 1fr; } }
 
-  @media(max-width: 720px) {
-    .row { grid-template-columns: 1fr; }
-  }
-
-  /* BOTÕES */
+  /* BUTTONS */
   button {
     background: var(--energisa-blue);
     color: white;
@@ -118,12 +103,7 @@
   }
   button:hover { background: var(--energisa-blue-dark); }
 
-  .small {
-    padding: 10px;
-    font-size: 13px;
-    background: var(--energisa-orange);
-  }
-
+  .small { padding: 10px; font-size: 13px; background: var(--energisa-orange); }
   .small:hover { background: #d85e1c; }
 
   /* LINK DASHBOARD */
@@ -138,10 +118,7 @@
     font-weight: 700;
     text-decoration: none;
   }
-
-  .dashboard-btn:hover {
-    background: #005f85;
-  }
+  .dashboard-btn:hover { background: #005f85; }
 
   .muted {
     color: #666;
@@ -153,26 +130,21 @@
 </head>
 <body>
 
-<!-- 🔹 HEADER PADRÃO ENERGISA -->
+<!-- HEADER -->
 <div class="header">
   <h2><i class="bi bi-file-earmark-text"></i> Prestação de Contas - ADD</h2>
-
-  <button class="logout-btn" onclick="logout()">
-    <i class="bi bi-box-arrow-right"></i> Sair
-  </button>
+  <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sair</button>
 </div>
 
 <div class="card">
   <h1>FORMULÁRIO</h1>
 
   <form id="addForm" autocomplete="off">
-
     <div class="row">
       <div>
         <label>Nome *</label>
         <input id="nome" required>
       </div>
-
       <div>
         <label>Email *</label>
         <input id="email" required>
@@ -192,10 +164,17 @@
         <label>Polo *</label>
         <select id="polo" required>
           <option value="">Selecione...</option>
-          <option>João Pessoa</option><option>Mamanguape</option>
-          <option>Borborema</option><option>Campina Grande</option>
-          <option>Monteiro</option><option>Guarabira</option>
-          <option>Sousa</option><option>Patos</option>
+          <option>João Pessoa</option>
+          <option>Itabaiana</option>
+          <option>Mamanguape</option>
+          <option>Borborema</option>
+          <option>Campina Grande</option>
+          <option>Monteiro</option>
+          <option>Guarabira</option>
+          <option>Esperança</option>
+          <option>Itaporanga</option>
+          <option>Sousa</option>
+          <option>Patos</option>
           <option>Catolé do Rocha</option>
         </select>
       </div>
@@ -206,7 +185,6 @@
         <label>Matrícula *</label>
         <input id="matricula" required>
       </div>
-
       <div>
         <label>Data de Uso *</label>
         <input type="date" id="datauso" required>
@@ -223,7 +201,6 @@
           <option>EXTRA</option>
         </select>
       </div>
-
       <div>
         <label>Horário *</label>
         <input type="time" id="horario" required>
@@ -240,7 +217,6 @@
         <label>Solicitar Localização (opcional)</label>
         <button type="button" id="btnGeo" class="small">Obter Localização</button>
       </div>
-
       <div>
         <label>Coordenadas</label>
         <input id="geo" readonly>
@@ -257,7 +233,6 @@
         <label>Nº OS / RR / SS</label>
         <input id="osrrss">
       </div>
-
       <div>
         <label>Número do ADD</label>
         <input id="numeroadd">
@@ -271,7 +246,6 @@
 
     <button id="btnSubmit">Enviar Registro</button>
 
-    <!-- Link Dashboard -->
     <a class="dashboard-btn" href="https://pedrofillype14.github.io/prestacao_dashboard/">
       <i class="bi bi-search"></i> Acessar Dashboard
     </a>
@@ -280,133 +254,130 @@
   </form>
 </div>
 
-
 <script>
-/* 🔴 LOGOUT */
+
+/* 🔹 LOGOUT */
 function logout(){
   localStorage.clear();
   window.location.href = "https://pedrofillype14.github.io/login/";
 }
 
-<script>
-// 🔒 BLOQUEIO: só acessa se estiver logado
+/* 🔹 INICIALIZAÇÃO */
 document.addEventListener("DOMContentLoaded", async () => {
-    const userLogado = localStorage.getItem("usuarioLogado");
-    const matricula = localStorage.getItem("matricula");
 
-    if (!userLogado || !matricula) {
-        window.location.href = "https://pedrofillype14.github.io/login/";
-        return;
+  // --- VALIDA LOGIN ---
+  const matriculaSalva = localStorage.getItem("matricula");
+
+  if (!matriculaSalva) {
+    alert("Matrícula não encontrada. Faça login novamente.");
+    window.location.href = "https://pedrofillype14.github.io/login/";
+    return;
+  }
+
+  // CAMPOS
+  const nome = document.getElementById("nome");
+  const email = document.getElementById("email");
+  const matricula = document.getElementById("matricula");
+
+  matricula.value = matriculaSalva;
+  matricula.readOnly = true;
+  matricula.style.background = "#e9ecef";
+
+  // --- BUSCA NO WORKER ---
+  try {
+    const resp = await fetch(`https://long-hall-0aaa.pedro-fillype.workers.dev/colaborador?matricula=${matriculaSalva}`);
+    const json = await resp.json();
+
+    if (json.ok && json.dados) {
+      nome.value = json.dados.nome;
+      email.value = json.dados.email;
+
+      nome.readOnly = true;
+      email.readOnly = true;
+
+      nome.style.background = "#e9ecef";
+      email.style.background = "#e9ecef";
     }
-
-    // 🔄 Preencher automaticamente os dados
-    preencherDadosUsuario(matricula);
+  } catch (err) {
+    console.error("Erro ao buscar dados:", err);
+  }
 });
 
-/* ============================================================
-   🔵 FUNÇÃO PARA BUSCAR DADOS DO COLABORADOR NO WORKER
-   E PREENCHER O FORMULÁRIO AUTOMATICAMENTE
-============================================================ */
-async function preencherDadosUsuario(matricula) {
-    try {
-        const resp = await fetch(
-            `https://long-hall-0aaa.pedro-fillype.workers.dev/usuario?matricula=${matricula}`
-        );
-
-        const dados = await resp.json();
-
-        if (!dados.ok || !dados.user) return;
-
-        const u = dados.user;
-
-        // Preenche automaticamente
-        document.getElementById("nome").value = u.nome;
-        document.getElementById("email").value = u.email;
-        document.getElementById("matricula").value = u.matricula;
-        document.getElementById("regional").value = u.regional || "";
-        document.getElementById("polo").value = u.polo || "";
-
-        // ❌ Bloqueia para impedir alteração
-        document.getElementById("nome").disabled = true;
-        document.getElementById("email").disabled = true;
-        document.getElementById("matricula").disabled = true;
-        document.getElementById("regional").disabled = true;
-        document.getElementById("polo").disabled = true;
-
-    } catch (err) {
-        console.error("Erro ao buscar dados:", err);
-    }
-}
-
-/* ============================================================
-   📍 GEOLOCALIZAÇÃO
-============================================================ */
+/* 🔹 GEOLOCALIZAÇÃO */
 document.getElementById("btnGeo").addEventListener("click", () => {
-    const output = document.getElementById("geo");
+  const btnGeo = document.getElementById("btnGeo");
+  const geo = document.getElementById("geo");
 
-    if (!navigator.geolocation) {
-        output.value = "Geolocalização não suportada";
-        return;
-    }
+  if (!navigator.geolocation) {
+    alert("Seu navegador não suporta geolocalização.");
+    return;
+  }
 
-    navigator.geolocation.getCurrentPosition(
-        (pos) => {
-            const lat = pos.coords.latitude.toFixed(6);
-            const lon = pos.coords.longitude.toFixed(6);
-            output.value = `${lat}, ${lon}`;
-        },
-        () => { output.value = "Erro ao obter localização"; }
-    );
+  btnGeo.innerText = "Capturando...";
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      geo.value = `${lat}, ${lng}`;
+      btnGeo.innerText = "Localização OK!";
+      btnGeo.style.background = "#43a047";
+    },
+    () => {
+      alert("Não foi possível capturar a localização.");
+      btnGeo.innerText = "Obter Localização";
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
 });
 
-/* ============================================================
-   📤 ENVIO DO FORMULÁRIO
-============================================================ */
+/* 🔹 ENVIO DO FORMULÁRIO */
 document.getElementById("addForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const dados = {
-        nome: document.getElementById("nome").value,
-        email: document.getElementById("email").value,
-        regional: document.getElementById("regional").value,
-        polo: document.getElementById("polo").value,
-        matricula: document.getElementById("matricula").value,
-        datauso: document.getElementById("datauso").value,
-        tiporefeicao: document.getElementById("tiporefeicao").value,
-        horario: document.getElementById("horario").value,
-        localidade: document.getElementById("localidade").value,
-        gps: document.getElementById("geo").value,
-        sequencia: document.getElementById("sequencia").value,
-        osrrss: document.getElementById("osrrss").value,
-        numeroadd: document.getElementById("numeroadd").value,
-        observacao: document.getElementById("observacao").value
-    };
+  const btn = document.getElementById("btnSubmit");
+  btn.disabled = true;
+  btn.innerText = "Enviando...";
 
-    const btn = document.getElementById("btnSubmit");
-    btn.innerText = "Enviando...";
-    btn.disabled = true;
+  const get = id => document.getElementById(id).value.trim();
 
-    try {
-        const resp = await fetch("https://long-hall-0aaa.pedro-fillype.workers.dev/add-registro", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dados)
-        });
+  const payload = {
+    nome: get("nome"),
+    email: get("email"),
+    regional: get("regional"),
+    polo: get("polo"),
+    matricula: get("matricula"),
+    datauso: get("datauso"),
+    tiporefeicao: get("tiporefeicao"),
+    horario: get("horario"),
+    localidade: get("localidade"),
+    gps: get("geo"),
+    sequencia: get("sequencia"),
+    osrrss: get("osrrss"),
+    numeroadd: get("numeroadd"),
+    observacao: get("observacao")
+  };
 
-        const result = await resp.json();
+  try {
+    const fd = new FormData();
+    for (const [k, v] of Object.entries(payload)) fd.append(k, v);
 
-        if (result.ok) {
-            alert("Registro enviado com sucesso!");
-            document.getElementById("addForm").reset();
-        } else {
-            alert("Erro ao enviar!");
-        }
-    } catch (error) {
-        alert("Erro de comunicação.");
-    }
+    const resp = await fetch("https://long-hall-0aaa.pedro-fillype.workers.dev/submit", {
+      method: "POST",
+      body: fd
+    });
 
-    btn.innerText = "Enviar Registro";
-    btn.disabled = false;
+    if (!resp.ok) throw new Error("Erro no servidor");
+    
+    alert("Registro enviado com sucesso!");
+    document.getElementById("addForm").reset();
+  } 
+  catch (err) {
+    alert("Erro: " + err.message);
+  }
+
+  btn.disabled = false;
+  btn.innerText = "Enviar Registro";
 });
 </script>
 
